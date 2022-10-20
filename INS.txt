@@ -1,0 +1,671 @@
+#Caesar Cipher
+
+dictionary = ['a','b','c','d',
+              'e','f','g','h',
+              'i','j','k','l',
+              'm','n','o','p',
+              'q','r','s','t',
+              'u','v','w','x',
+              'y','z','0','1',
+              '2','3','4','5',
+              '6','7','8','9',
+              '!','@','#','$',
+              '%','^','*']
+
+plain_text = input("Enter Plain Text: ").replace(" ", "").lower()
+key = int(input("Key: "))
+
+
+print("Plain Text: ", plain_text)
+
+# Encryption
+def encryption(text, key):
+    encrypted_text = ""
+    for letter in text:
+        encrypted_text += dictionary[(dictionary.index(letter)+key)%len(dictionary)]
+    return encrypted_text
+
+encrypted_text = encryption(plain_text, key)
+print("Encrypted Text: ", encrypted_text)
+
+# Decryption
+def decryption(text, key):
+    decryted_text =""
+    for letter in text:
+        decryted_text += dictionary[(dictionary.index(letter)-key)%len(dictionary)]
+    return decryted_text
+
+decrypted_text = decryption(encrypted_text, key)
+print("Decrypted Text: ", decrypted_text)
+
+
+
+------------------------------------------------------------------------------------------------------
+
+
+
+# Monoalphabetic Cipher
+
+dictionary = ['a','b','c','d',
+              'e','f','g','h',
+              'i','j','k','l',
+              'm','n','o','p',
+              'q','r','s','t',
+              'u','v','w','x',
+              'y','z']
+
+plain_text = input("Enter Plain Text: ").replace(" ", "").lower()
+
+def encryption(text):
+    encrypted_text = ""
+    for letter in text:
+        encrypted_text += dictionary[-dictionary.index(letter)-1]
+    return encrypted_text
+encrypted_text = encryption(plain_text)
+print("Encrypted text: ", encrypted_text)
+
+def decryption(text):
+    decrypted_text = ""
+    for letter in text:
+        decrypted_text += dictionary[-dictionary.index(letter)-1]
+    return decrypted_text
+
+print("Encrypted text: ", decryption(encrypted_text))
+
+
+---------------------------------------------------------------------------------------------
+
+
+# Vernam Cipher
+
+dictionary = ['a','b','c','d',
+              'e','f','g','h',
+              'i','j','k','l',
+              'm','n','o','p',
+              'q','r','s','t',
+              'u','v','w','x',
+              'y','z']
+
+plain_text = input("Enter Plain Text: ").replace(" ", "").lower()
+
+key = input("Enter key (text) (same length as plain text): ").replace(" ","").lower()
+
+print("Plain Text: ", plain_text)
+
+# Ex-OR operation function
+def performXOR(binary_letter1, binary_letter2):
+    binary_output = ""
+    for i in range(len(binary_letter1)):
+        if binary_letter1[i] == binary_letter2[i]:
+            binary_output += "0"
+        else:
+            binary_output += "1"
+    return binary_output
+
+# Encryption
+def encryption(text, key):
+    encrypted_text = ""
+    for i in range(len(text)):
+        # Converting plain text to binary
+        binary_letter1 = bin(dictionary.index(text[i]))
+        binary_letter2 = bin(dictionary.index(key[i]))
+        
+        # Converting binary numbers to similar length
+        temp = binary_letter1
+        binary_letter1 = "0"*(8-len(temp[2:]))+temp[2:]
+        temp = binary_letter2
+        binary_letter2 = "0"*(8-len(temp[2:]))+temp[2:]
+
+        # Converting binary to letter
+        binary_output = performXOR(binary_letter1, binary_letter2)
+        encrypted_text += dictionary[int(binary_output, 2)%len(dictionary)]
+    return encrypted_text
+
+encrypted_text = encryption(plain_text, key)
+
+print("Encrypted Text: ",encrypted_text)
+    
+def decryption(text, key):
+    decrypted_text = ""
+    for i in range(len(text)):
+        # Converting plain text to binary
+        binary_letter1 = bin(dictionary.index(text[i]))
+        binary_letter2 = bin(dictionary.index(key[i]))
+        
+        # Converting binary numbers to similar length
+        temp = binary_letter1
+        binary_letter1 = "0"*(8-len(temp[2:]))+temp[2:]
+        temp = binary_letter2
+        binary_letter2 = "0"*(8-len(temp[2:]))+temp[2:]
+
+        # Converting binary to letter
+        binary_output = performXOR(binary_letter1, binary_letter2)
+        decrypted_text += dictionary[int(binary_output, 2)%len(dictionary)]
+    return decrypted_text
+
+print("Decrypted Text: ",decryption(encrypted_text, key))
+print("Decrypted Text: ",plain_text)
+
+--------------------------------------------------------------------------------------------------------------------
+
+#Playfair Cipher
+
+#key matrix
+key = [['l','g','d','b','a'],
+       ['q','m','h','e','c'],
+       ['u','r','n','i','f'],
+       ['x','v','s','o','k'],
+       ['z','y','w','t','p']]
+       
+# Taking input and making pairs
+plain_text = input("Enter Plain Text: ").replace(" ", "").replace("j", "i").lower()
+print("Plain Text: ", plain_text)
+
+# bogus_letter should not be there in plain text
+bogus_letter = 'x'
+
+
+def seperate_letters(text):
+    seperated_letters = []
+    i = 1
+    while True:
+        try:
+            if text[i-1] != text[i]:
+                seperated_letters.append(text[i-1]+text[i])
+                i+=2
+            else:
+                seperated_letters.append(text[i]+bogus_letter)
+                i += 1
+        except:
+            if i == len(text):
+                seperated_letters.append(text[-1]+bogus_letter)
+            break
+    return seperated_letters 
+
+
+
+# search element in key:
+def indexOfLetter(key, letter):
+    for i in range(len(key)):
+        for j in range(len(key)):
+            if key[i][j] == letter:
+                return (i,j)
+
+# Encryption
+def encryption(plain_text):
+    encrypted_text = ""
+    seperated_letters = seperate_letters(plain_text)
+    for pair in seperated_letters:
+        letter1_index = indexOfLetter(key, pair[0])
+        letter2_index = indexOfLetter(key, pair[1])
+
+        # rule 1: same column
+        if letter1_index[1] == letter2_index[1]:
+            encrypted_text += key[(letter1_index[0]+1)%len(key)][letter1_index[1]]+key[(letter2_index[0]+1)%len(key)][letter2_index[1]]
+
+        # rule 2: same row
+        elif letter1_index[0] == letter2_index[0]:
+            encrypted_text += key[letter1_index[0]][(letter1_index[1]+1)%len(key)]+key[letter2_index[0]][(letter2_index[1]+1)%len(key)]
+
+        # rule 3: different column and row
+        else:
+            encrypted_text += key[letter1_index[0]][letter2_index[1]]+key[letter2_index[0]][letter1_index[1]]
+    return encrypted_text
+
+encrypted_text = encryption(plain_text)
+
+print("Encrypted Text: ", encrypted_text)
+
+# Deccryption
+def decryption(encrypted_text):
+    decrypted_text = ""
+    seperated_letters = seperate_letters(encrypted_text)
+    for pair in seperated_letters:
+        letter1_index = indexOfLetter(key, pair[0])
+        letter2_index = indexOfLetter(key, pair[1])
+
+        # rule 1: same column
+        if letter1_index[1] == letter2_index[1]:
+            decrypted_text += key[(letter1_index[0]-1)%len(key)][letter1_index[1]]+key[(letter2_index[0]-1)%len(key)][letter2_index[1]]
+
+        # rule 2: same row
+        elif letter1_index[0] == letter2_index[0]:
+            decrypted_text += key[letter1_index[0]][(letter1_index[1]-1)%len(key)]+key[letter2_index[0]][(letter2_index[1]-1)%len(key)]
+
+        # rule 3: different column and row
+        else:
+            decrypted_text += key[letter1_index[0]][letter2_index[1]]+key[letter2_index[0]][letter1_index[1]]
+    return decrypted_text
+decrypted_text = decryption(encrypted_text)
+decrypted_text =  decrypted_text.replace(bogus_letter, "")
+print("Decryted_text: ", decrypted_text)
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#railfence cipher 
+
+
+s=input("Enter string: ")
+k=int(input("Enter key: "))
+enc=[[" " for i in range(len(s))] for j in range(k)]
+flag=0
+row=0
+print(enc)
+for i in range(len(s)):
+  enc[row][i]=s[i]
+  if row==0:
+    flag=0
+  elif row==k-1:
+    flag=1
+  if flag==0:
+    row+=1
+  else:
+    row-=1
+for i in range(k):
+  print("".join(enc[i]))
+ct=[]
+for i in range(k):
+    for j in range(len(s)):
+        if enc[i][j]!=' ':
+            ct.append(enc[i][j])
+cipher="".join(ct)
+print("Cipher Text: ",cipher)
+
+decr=[[" " for i in range(len(cipher))] for j in range(k)]
+flag=0
+row=0
+
+array=[]
+for i in range(len(s)):
+  decr[row][i]="*"
+  if row==0:
+    flag=0
+  elif row==k-1:
+    flag=1
+  if flag==0:
+    row+=1
+  else:
+    row-=1
+for i in range(k):
+  print("".join(decr[i]))
+index=0
+for i in range(k):
+    for j in range(len(cipher)):
+        if decr[i][j]=="*":
+            decr[i][j]=cipher[index]
+            index=index+1
+
+print(cipher1)
+
+dct=[]
+flag=0
+row=0
+for i in range(len(s)):
+    dct.append(decr[row][i])
+    if row==0:
+      flag=0
+    elif row==k-1:
+      flag=1
+    if flag==0:
+      row+=1
+    else:
+      row-=1
+print(dct)
+decipher="".join(dct)
+print("Decipher text : ",decipher)
+
+
+------------------------------------------------------------------------------------
+
+# Simple Columnar Technique with decryption
+
+import math
+
+plain_text = input("Enter Plain Text: ")
+cols = int(input("Enter number of Columns: "))
+rows = math.ceil(len(plain_text) / cols)
+# key should be any pattern between 0 to (cols-1) of length cols
+key = input("Enter Key: "))
+
+def encrypt(text, c, r, temp_key):
+    container = [[" "]*c for _ in range(r)]
+    k = 0
+    encipher = ""
+    text = text + "x" * ((c * r) - len(text))
+    for i in range(rows):
+        for j in range(cols):
+            container[i][j] = text[k]
+            k+=1
+    for i in container:
+        print(i)
+    for i in str(temp_key):
+        for j in range(r):
+            encipher += container[j][int(i)]
+    return encipher
+
+print("Plain Text: ", plain_text)
+encrypted_text = encrypt(plain_text, cols, rows, key)
+print("Encrypted Text: ", encrypted_text)
+
+def decrypt(text, c, r, temp_key):
+    container = [[" "]*c for _ in range(r)]
+    k = 0
+    decipher = ""
+    for i in range(cols):
+        for j in range(rows):
+            container[j][i] = text[k]
+            k+=1
+    for i in container:
+        print(i)
+    for i in range(r):
+        for j in str(temp_key):
+            decipher += container[i][int(j)]
+    return decipher
+
+decrypted_text = decrypt(encrypted_text, cols, rows, key)
+print("Decrypted Text: ", decrypted_text)
+
+
+--------------------------------------------------------------------------------------------------
+#AES algorithm 
+
+// pip install pycryptodome
+from Crypto.Cipher import AES
+
+# Variable Declarations
+key = "this is a key123"
+data = input("Enter data to encrypt (16 byte): ").strip()
+iv = "this is a iv1234"
+
+# Converting data to 16 bytes
+if(len(data) < 16):
+    data = data * (16 // len(data))
+    data += data[:16 - len(data)]
+else:
+    data = data[:16]
+print("Plain text: ", data)
+
+# Encryption
+e_cipher = AES.new(key.encode("utf8"), AES.MODE_CBC, iv.encode("utf8"))
+ciphertext = e_cipher.encrypt(data.encode("utf8"))
+
+print("Encrypted Text: ",ciphertext)
+
+# Decryption
+d_cipher = AES.new(key.encode("utf8"), AES.MODE_CBC, iv.encode("utf8"))
+decipher = d_cipher.decrypt(ciphertext)
+
+print("Decrypted Text: ",decipher)
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+# pip install pyDes
+from pyDes import *
+
+key = "12345678"
+data = "hello"
+
+k = des(key, CBC, '\0\0\0\0\0\0\0\0', pad=None, padmode=PAD_PKCS5)
+
+d = k.encrypt(data)
+
+print("encrypted: ", d)
+
+print("decrypted: ", k.decrypt(d))
+
+
+#DES algortihm 
+
+//pip install pyDes
+
+import base32hex
+import hashlib
+from Crypto.Cipher import DES
+password = "Password"
+salt = '\x28\xAB\xBC\xCD\xDE\xEF\x00\x33'
+key = password + salt
+m = hashlib.md5(key.encode("utf-8"))
+key = m.digest()
+(dk, iv) = (key[:8], key[8:])
+crypter = DES.new(dk,DES.MODE_CBC, iv)
+dcrypter = DES.new(dk,DES.MODE_CBC, iv)
+
+plain_text = "I see you"
+print("The plain text is : ", plain_text)
+# Padding
+plain_text += '\x00' * (8 - len(plain_text) % 8)
+# Encrypting
+ciphertext = crypter.encrypt(plain_text.encode("utf-8"))
+# Encoding
+encode_string = base32hex.b32encode(ciphertext)
+print("The encoded string is : ", encode_string)
+plainText = dcrypter.decrypt(encode_string.encode())
+print("The decoded string is : ", plain_text)
+
+
+------------------------------------------------------------------------------------------
+
+# RSA algorithm //use these inputs 7 11 7, 13 17  7, 13 7 5 
+
+values = ['a', 'b', 'c', 'd', 
+          'e', 'f', 'g', 'h', 
+          'i', 'j', 'k', 'l', 
+          'm', 'n', 'o', 'p', 
+          'q', 'r', 's', 't', 
+          'u', 'v', 'w', 'x', 
+          'y', 'z']
+
+def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
+
+def is_prime(n):
+    for i in range(2, n):
+        if (n % i) == 0:
+            return False
+    return True
+
+while True:
+    P = int(input("Enter a Prime Number: "))
+    Q = int(input("Enter another Prime Number: "))
+    if (is_prime(P) and is_prime(Q)):
+        break
+
+n = P * Q
+z = (P - 1) * (Q - 1)
+
+while True:
+    e = int(input("Enter a Encryption Exponent: "))
+    if (e < n) and (gcd(e, z) == 1):
+        break
+
+# Automatic deciding the value of d (for testing purpose)
+k = 0
+while True:
+    td = (1+ (k*z)) // e
+    if (e*td)%z == 1:
+        d = td
+        break
+    k+=1
+
+
+print("Public Key (%d, %d)" % (n, e))
+print("Private Key (%d, %d)" % (n, d))
+
+plain_text = input("Enter Plain Text: ").replace(" ", "").lower()
+
+def encrypt(text):
+    encipher = []
+    for i in range(len(text)):
+        en = values.index(text[i])+1
+        encipher.append(((en**e) % n))
+    return encipher
+
+print("Plain Text: ", plain_text)
+encrypted_val = encrypt(plain_text)
+encrypted_text = ""
+for en in encrypted_val:
+    encrypted_text += values[(en%26)+1]
+print("Encrypted Text: ", encrypted_text)
+
+def decrypt(text):
+    decipher = ""
+    for i in range(len(text)):
+        en = text[i]
+        decipher += values[((en**d) % n)-1]
+    return decipher
+
+decrypted_text = decrypt(encrypted_val)
+print("Decrypted Text: ", decrypted_text)
+
+-------------------------------------------------------------------------------------------------------------
+
+# Hellman
+import math
+
+def hellman(Xa, Xb, p, a):
+    Ya = (math.pow(a,Xa) % p)
+    Yb = (math.pow(a,Xb) % p)
+
+    Ka = (math.pow(Yb, Xa) % p)
+    Kb = (math.pow(Ya, Xb) % p)
+    print(Ka, Kb)
+    if (Ka == Kb):
+        print("Transmission successful")
+    else:
+        print("Transmission failed")
+
+Xa,Xb = input("Enter the value of Xa & Xb: ").split()
+Xa = int(Xa)
+Xb = int(Xb)
+p = int(input("Enter a Prime no. p: "))
+a = int(input("Enter Primitive Root a, with condition that a<p: "))
+
+hellman(Xa, Xb, p, a)
+
+----------------------------------------------------------------------------------
+
+#MD5
+
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class INS_Prac7 {
+
+    public static void main(String[] args) {
+
+        System.out.println("For null " + generateHash(""));
+
+        System.out.println("For simple text " + generateHash("sies"));
+
+        System.out.println("For simple text2 " + generateHash("Sies"));
+    }
+
+    public static String generateHash(String input) {
+
+        String md5 = null;
+
+        if (null == input)
+            return null;
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            digest.update(input.getBytes(), 0, input.length());
+            md5 = new BigInteger(1, digest.digest()).toString(16);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return md5;
+    }
+}
+
+----------------------------------------------------------------
+
+#HMAC-SHA1
+
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class INS_Prac8 {
+
+    public static void main(String[] args) {
+
+        System.out.println("For null " + generateHash(""));
+
+        System.out.println("For simple text1 " + generateHash("sies"));
+
+        System.out.println("For simple text2 " + generateHash("Sies"));
+    }
+
+    public static String generateHash(String input) {
+
+        String SHA1 = null;
+
+        if (null == input)
+            return null;
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            digest.update(input.getBytes(), 0, input.length());
+            SHA1 = new BigInteger(1, digest.digest()).toString(16);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return SHA1;
+    }
+}
+
+-------------------------------------------------------------------
+
+# Vigenere Cipher
+
+dictionary = ['a', 'b', 'c', 'd',
+              'e', 'f', 'g', 'h',
+              'i', 'j', 'k', 'l',
+              'm', 'n', 'o', 'p',
+              'q', 'r', 's', 't',
+              'u', 'v', 'w', 'x',
+              'y', 'z']
+
+plain_text = input("Enter Plain Text: ").lower().replace(" ", "")
+temp_key = input("Enter Key: ").lower()
+
+def encrypt(text, temp):
+    encipher = ""
+    # creating key of same length
+    key = temp * (len(text) // len(temp))
+    key += key[:len(text) - len(key)]
+    for i in range(len(text)):
+        pi = dictionary.index(text[i])
+        ki = dictionary.index(key[i])
+        encipher += dictionary[((pi + ki) % 26)]
+    return encipher
+
+encrypted_text = encrypt(plain_text, temp_key)
+
+def decrypt(text, temp):
+    decipher = ""
+    # creating key of same length
+    key = temp * (len(text) // len(temp))
+    key += key[:len(text) - len(key)]
+    for i in range(len(text)):
+        pi = dictionary.index(text[i])
+        ki = dictionary.index(key[i])
+        decipher += dictionary[((pi - ki) % 26)]
+    return decipher
+
+decypted_text = decrypt(encrypted_text, temp_key)
+
+print("Plain Text: ", plain_text)
+print("Encrypted Text: ", encrypted_text)
+print("Decrypted Text: ", decypted_text)
+
+
+
+
+
+
