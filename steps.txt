@@ -1,0 +1,43 @@
+{
+    public Text winText;
+    public Text countText;
+    public int count;
+    private Rigidbody rb;
+    public float speed;
+    // Start is called before the first frame update
+    void Start()
+    {
+        count = 0;
+        winText.text = "";
+        rb = GetComponent<Rigidbody>();
+        SetCountText();
+    }
+
+    // Update is called once per frame
+    void FixedUpdate()
+    {
+        float moveHorizontal = Input.GetAxis("Horizontal");
+        float moveVertical = Input.GetAxis("Vertical");
+        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        rb.AddForce(movement * speed);
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("PickUp"))
+        {
+            other.gameObject.SetActive(false);
+            count = count + 1;
+            SetCountText();
+        }
+    }
+    void SetCountText()
+    {
+        countText.text = "Count : " + count.ToString();
+        if (count >= 8)
+        {
+            winText.text = "You win!";
+        }
+
+    }
+}
