@@ -1,0 +1,478 @@
+Aim: Using unity create 3D Ball Game. 
+
+ 
+
+Steps:  
+
+ 
+
+ 
+
+After logging in : Select 3D template Give project name click on create project 
+
+Plus Symbol below Hierarchy ->Select 3D Object ->Select Plane -> inside inspector window -> give name: Ground 
+
+Plus Symbol below Hierarchy ->Select 3D Object ->Select Sphere -> inside inspector window -> give name: Player -> Position -> change Y value to 0.5 (now the sphere is completely visible) 
+
+ 
+
+ 
+
+ Click on plus sign below the Project Window -> select Folder -> give name: materials 
+
+Keep the materials folder selected -> again click on plus sign below the Project Window -> select Material -> give name: background 
+
+Inspector window of background -> Main Maps -> Albedo -> select colour of your choice 
+
+ 
+
+Then drag the background to the hierarchy -> on the Ground (you can see the colour changes) 
+
+ 
+
+ 
+
+Select Player -> Add component -> Physics -> Rigidbody 
+
+Select Player -> Add component -> New Script -> give name: PlayerController -> open the script and write code: 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+using System.Collections; 
+
+using System.Collections.Generic; 
+
+using UnityEngine; 
+
+ 
+
+public class PlayerController : MonoBehaviour 
+
+{ 
+
+    private Rigidbody rb; 
+
+    public float speed; 
+
+    // Start is called before the first frame update 
+
+    void Start() 
+
+    { 
+
+        rb = GetComponent<Rigidbody>(); 
+
+    } 
+
+ 
+
+    // Update is called once per frame 
+
+    void FixedUpdate() 
+
+    { 
+
+        float moveHorizontal = Input.GetAxis("Horizontal");  
+
+        float moveVertical = Input.GetAxis("Vertical"); 
+
+        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);  
+
+        rb.AddForce(movement*speed); 
+
+ 
+
+    } 
+
+} 
+
+ 
+
+Inspector window of Player -> go to the end -> change speed to 10 
+
+Test the game (Move using up, down, right & left arrow keys) 
+
+ 
+
+ 
+
+Select Main Camera -> Inspector window -> and change values  
+
+ 
+
+ 
+
+ 
+
+Select Main Camera -> Inspector window -> New Script -> give name: CameraController -> open the script and write code: 
+
+ 
+
+ 
+
+using System.Collections; 
+
+using System.Collections.Generic; 
+
+using UnityEngine; 
+
+ 
+
+public class CameraController : MonoBehaviour 
+
+{ 
+
+    private Vector3 offset; 
+
+    public GameObject player; 
+
+    // Start is called before the first frame update 
+
+    void Start() 
+
+    { 
+
+        offset = transform.position - player.transform.position; 
+
+    } 
+
+ 
+
+    // Update is called once per frame 
+
+    void LateUpdate() 
+
+    { 
+
+        transform.position = player.transform.position + offset; 
+
+    } 
+
+} 
+
+ 
+
+Select CameraController -> in Inspector window -> drag the Player from hierarchy inside the Camera Controller Script  
+
+ 
+
+ 
+
+ 
+
+Test the game (You can see the camera focus moving along) 
+
+ 
+
+ 
+
+Click on plus sign below the Hierarchy -> Create Empty -> rename: Walls 
+
+Click on plus sign below the Hierarchy -> 3D Object -> Cube -> rename: westwall 
+
+Drag westwall inside Walls and change values for westwall 
+
+ 
+
+Similarly create for other three walls 
+
+ 
+
+ 
+
+ 
+
+ 
+
+eastwall: 
+
+ 
+
+ 
+
+northwall: 
+
+ 
+
+ 
+
+southwall: 
+
+ 
+
+ 
+
+Test the game 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Click on plus sign below the Project Window -> select Folder -> give name: prefabs 
+
+Plus Symbol below Hierarchy ->Select 3D Object ->Select Cube -> inside inspector window -> give name: Pickup 
+
+GameObject Tab -> rename: Pickups 
+
+Drag pickup inside pickups 
+
+Now drag pickup to prefabs folder 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+(uncheck Player) Go to Inspector window of Pickup -> change values 
+
+ 
+
+ 
+
+ 
+
+Add component -> New Script -> name: Rotator and write code: 
+
+ 
+
+using System.Collections; 
+
+using System.Collections.Generic; 
+
+using UnityEngine; 
+
+ 
+
+public class Rotator : MonoBehaviour 
+
+{ 
+
+    // Start is called before the first frame update 
+
+    void Start() 
+
+    { 
+
+         
+
+    } 
+
+ 
+
+    // Update is called once per frame 
+
+    void Update() 
+
+    { 
+
+        transform.Rotate(new Vector3(15, 30, 45) * Time.deltaTime); 
+
+    } 
+
+} 
+
+Save and Test 
+
+Go to Scene -> change from Local to Global 
+
+Make duplicates of Pickup ( Control + D ) 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Scene Mode -> Change the direction to top view -> Drag and Drop all the Pickups from hieracrchy 
+
+  
+
+ 
+
+ 
+
+Enable the Player & test the game 
+
+ 
+
+Update PlayerController Script 
+
+ 
+
+ 
+
+using System.Collections; 
+
+using System.Collections.Generic; 
+
+using UnityEngine; 
+
+using UnityEngine.UI; 
+
+ 
+
+public class PlayerController : MonoBehaviour 
+
+{ 
+
+    public Text winText; 
+
+    public Text countText; 
+
+    public int count; 
+
+    private Rigidbody rb; 
+
+    public float speed; 
+
+    // Start is called before the first frame update 
+
+    void Start() 
+
+    { 
+
+        count = 0; 
+
+        winText.text = ""; 
+
+        rb = GetComponent<Rigidbody>(); 
+
+        SetCountText(); 
+
+    } 
+
+ 
+
+    // Update is called once per frame 
+
+    void FixedUpdate() 
+
+    { 
+
+        float moveHorizontal = Input.GetAxis("Horizontal");  
+
+        float moveVertical = Input.GetAxis("Vertical"); 
+
+        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);  
+
+        rb.AddForce(movement*speed); 
+
+ 
+
+    } 
+
+    void OnTriggerEnter(Collider other) 
+
+    { 
+
+        if (other.gameObject.CompareTag("PickUp")) 
+
+        { 
+
+            other.gameObject.SetActive(false); 
+
+            count = count + 1; 
+
+            SetCountText(); 
+
+        } 
+
+    } 
+
+    void SetCountText() 
+
+    { 
+
+        countText.text = "Count : " + count.ToString(); 
+
+        if (count >= 9) 
+
+        { 
+
+            winText.text = "You win!"; 
+
+        } 
+
+ 
+
+    } 
+
+} 
+
+ 
+
+ 
+
+Prefabs folder -> Select Pickup (so it will be updated for all pickups) -> Add component -> Physics ->  Rigidbody (check ‘Is Trigger’ & ‘Is Kinematic’) 
+
+Scroll Up -> Click on Tag -> Add Tag -> click on pluss sign -> Name: “PickUp” (this name should be same as the name inside the code of PlayerController Script -> inside OnTriggerEnter) -> Save 
+
+Now again Click on Tag -> you can see PickUp option -> Select PickUp 
+
+ 
+
+Click on plus sign below Hierarchy -> UI -> text 
+
+
+Canvas is created -> inside it there is Text -> Rename the text to countText 
+
+Inside inspector window change ‘New Text’ to ‘countText’ 
+
+Change color to yellow  
+
+Select Player -> Then drag the counText from hierarchy to inspector of Player -> PlayerController Script -> inside CountText 
+
+
+Similarly take one more UI -> name: winText (follow the same steps as for countText) 
+
+ 
+
+To add Colors -> Inside materials folder -> create duplicate of background -> give name pickup -> change color through Albedo (green) -> drag this on to each player 
+
+Similarly create duplicate -> rename: player -> change color through Albedo (red) -> drag this on to player 
+
+ 
+
+Test the game: 
+
+
+
+
+
+
+
+
+
+
+
+
